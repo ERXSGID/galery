@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monokrom — Galeri Fotografi</title>
+  <meta name="description" content="Galeri fotografi hitam-putih bergaya elegan dengan tipografi tulisan tangan, tombol unduh per foto, dan kolom komentar." />
+  <meta name="theme-color" content="#0a0a0a" />
+
+  <!-- Google Fonts: Handwritten + Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b0b0c;
+      --bg-soft:#121214;
+      --text:#f3f3f3;
+      --muted:#bfbfbf;
+      --line:#2a2a2c;
+      --accent:#e5e5e5;
+      --radius:20px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text); font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif; line-height:1.6;
+    }
+    a{color:inherit; text-decoration:none}
+    img{display:block; max-width:100%; height:auto}
+    .container{width:min(1200px,92%); margin-inline:auto}
+
+    /* NAV */
+    header{position:sticky; top:0; z-index:50; backdrop-filter:saturate(120%) blur(6px); background:linear-gradient(180deg, rgba(11,11,12,.75), rgba(11,11,12,.4)); border-bottom:1px solid var(--line)}
+    .nav{display:flex; align-items:center; justify-content:space-between; padding:14px 0}
+    .logo{display:flex; align-items:baseline; gap:.5rem}
+    .brand{font-family: "Comic Sans MS", cursive, sans-serif; font-size:2.2rem; letter-spacing:.02em}
+    .tag{font-size:.9rem; color:var(--muted)}
+    .nav ul{display:flex; gap:1.2rem; list-style:none; padding:0; margin:0}
+    .nav a{padding:.5rem .8rem; border-radius:999px; transition:.25s ease}
+    .nav a:hover{background:var(--bg-soft)}
+
+    /* HERO */
+    .hero{padding:64px 0 30px; text-align:center}
+    .hero h1{font-family: "Comic Sans MS", cursive, sans-serif; font-size:3.2rem; font-weight:400; margin:.2rem 0 0}
+    .hero p{max-width:720px; margin:.6rem auto 0; color:var(--muted)}
+
+    /* GALLERY */
+    .gallery{display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:18px; padding:24px 0 10px}
+    .card{background:var(--bg-soft); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow)}
+    .thumb-wrap{position:relative; overflow:hidden}
+    .thumb{transition:transform .5s ease, filter .5s ease; width:100%; height:220px; object-fit:cover}
+    .card:hover .thumb{transform:scale(1.06); filter:grayscale(0%)}
+    .caption{padding:14px 14px 10px}
+    .title{font-weight:600; letter-spacing:.02em; margin:0 0 4px}
+    .desc{color:var(--muted); font-size:.95rem; margin:0 0 10px}
+    .actions{display:flex; gap:8px;}
+    .btn{appearance:none; border:1px solid var(--line); background:#141415; color:var(--text); padding:.55rem .9rem; border-radius:12px; cursor:pointer; transition:.25s; font-weight:600}
+    .btn:hover{transform:translateY(-1px); background:#1a1a1c}
+    .btn:active{transform:translateY(0)}
+    .btn.ghost{background:transparent}
+
+    /* MODAL */
+    dialog#lightbox{width:min(1024px,94%); border:none; padding:0; background:transparent}
+    .lightbox-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.6)}
+    .lightbox{position:relative; background:#000; border-radius:16px; overflow:hidden; box-shadow:var(--shadow)}
+    .lightbox img{width:100%; height:auto; display:block}
+    .lightbox .close{position:absolute; top:10px; right:10px; border:none; background:rgba(0,0,0,.6); color:#fff; padding:.45rem .65rem; border-radius:999px; cursor:pointer}
+
+    /* COMMENT SECTION */
+    #comments{margin:40px 0 80px}
+    #comments h2{font-family: "Comic Sans MS", cursive, sans-serif; font-size:2.4rem; font-weight:400; margin:0 0 4px}
+    .comment-form{display:grid; gap:12px; grid-template-columns:1fr 1fr; background:var(--bg-soft); border:1px solid var(--line); padding:16px; border-radius:16px}
+    .comment-form input, .comment-form textarea{width:100%; padding:.8rem; border-radius:10px; border:1px solid var(--line); background:#0f0f10; color:var(--text)}
+    .comment-form textarea{grid-column:1/-1; min-height:110px; resize:vertical}
+    .comment-form button{justify-self:start}
+    .comment-list{margin:18px 0 0; display:grid; gap:12px}
+    .comment{border:1px solid var(--line); background:var(--bg-soft); border-radius:14px; padding:12px 14px}
+    .comment .meta{font-size:.85rem; color:var(--muted); margin-bottom:6px}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--line); padding:26px 0; color:var(--muted)}
+
+    /* SMALL */
+    @media (max-width:640px){
+      .hero{padding:38px 0 12px}
+      .hero h1{font-size:2.6rem}
+      .comment-form{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header>
+    <nav class="container nav" aria-label="Navigasi utama">
+      <div class="logo">
+        <span class="brand">ERXSGID</span>
+        <span class="tag">Fotography</span>
+      </div>
+      <ul>
+        <li><a href="#home">Beranda</a></li>
+        <li><a href="#galeri">Galeri</a></li>
+        <li><a href="#tentang">Tentang</a></li>
+        <li><a href="#kontak">Kontak</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section id="home" class="hero container" aria-labelledby="judul-hero">
+    <h1 id="judul-hero">Jejak Dalam Setiap Langkah Kamera</h1>
+    <p>Seri foto hitam–putih yang menekankan bentuk, tekstur, dan emosi. Tipografi bergaya tulisan tangan memberi sentuhan personal pada setiap bingkai.</p>
+  </section>
+
+  <!-- GALLERY -->
+  <main id="galeri" class="container" aria-label="Galeri foto">
+    <div class="gallery">
+      <!-- CARD TEMPLATE (x9) -->
+      
+      <article class="card">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" src="https://blogger.googleusercontent.com/img/a/AVvXsEiIbodCza5a78udGOQCqYtOJvkXvnFnLVr0QHckChRXpny-bmKcrabZhj6SRluOyN2nM3b5dC0ueYzYeT7EZzQQKWSWefQC-NbnuCX6BJVK82G2dcSylGlqRUgrc-U69Uf-iMn7pr-1pkg6dfcUWgRwz6_fcw8U8l27GVdGxhR30pWnywP4sO6YFSbMRfE" alt="Gelombang laut monokrom di tepi pantai" />
+        </div>
+        <div class="caption">
+          <h3 class="title">Hening Ombak</h3>
+          <p class="desc">Tekstur ombak menangkap ritme alam; kontras tajam menenangkan pandangan.</p>
+          <div class="actions">
+            <button class="btn view" data-src="https://picsum.photos/id/1011/1600/1200?grayscale">Lihat</button>
+            <a class="btn ghost" href="https://picsum.photos/id/1011/2400/1800?grayscale" download>Unduh</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" src="https://blogger.googleusercontent.com/img/a/AVvXsEj1rqyjSacat3M6Bcti2XDFZaEap20DnXFHhZBYDMjZGRXZhjFqCqn9BIpQxofMgtXXBF9fbRQ32OeydR8vWXHtoGki25Ar-IDCfECVU_MY6i1R87RVcBoAceXJaYepm0RgUKJBZsq0cykZUBucvB4826WiAA8QHGUhhvBbcdoN0b7YZTBt26SqWosFdAI" alt="Anjing husky monokrom dengan sorot mata tajam" />
+        </div>
+        <div class="caption">
+          <h3 class="title">Tatap</h3>
+          <p class="desc">Sorot mata yang jujur—garis wajah menegaskan karakter.</p>
+          <div class="actions">
+            <button class="btn view" data-src="https://picsum.photos/id/1024/1600/1200?grayscale">Lihat</button>
+            <a class="btn ghost" href="https://picsum.photos/id/1024/2400/1800?grayscale" download>Unduh</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" src="https://blogger.googleusercontent.com/img/a/AVvXsEiTrwk7PUDp0q5b5pUzzOh8Y_0RqX36gh7q2XOSK4qiAFC_wg-9KuWdEtbcf_YhchKXjDpIJ1fxGYxLMleqqgWt1Mcis0DnLPZPOKROiSr3eCjn8DU3sBgUnoI-tnRsGHhRgl99mmXMBqNHgEbwW6QcmHvONTkkVaMw8H8b5OSYHoA_FNtQ2PA4aa7W358" alt="Pepohonan musim dingin dengan kabut tipis" />
+        </div>
+        <div class="caption">
+          <h3 class="title">Kabut Pagi</h3>
+          <p class="desc">Nada abu yang lembut menyatukan jarak dan rasa sepi.</p>
+          <div class="actions">
+            <button class="btn view" data-src="https://picsum.photos/id/1035/1600/1200?grayscale">Lihat</button>
+            <a class="btn ghost" href="https://picsum.photos/id/1035/2400/1800?grayscale" download>Unduh</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" src="https://picsum.photos/id/1068/800/600?grayscale" alt="Jalan kota basah seusai hujan dengan refleksi lampu" />
+        </div>
+        <div class="caption">
+          <h3 class="title">Selepas Hujan</h3>
+          <p class="desc">Refleksi lampu menjadi aksen—tekstur aspal berbicara.</p>
+          <div class="actions">
+            <button class="btn view" data-src="https://picsum.photos/id/1068/1600/1200?grayscale">Lihat</button>
+            <a class="btn ghost" href="https://picsum.photos/id/1068/2400/1800?grayscale" download>Unduh</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" src="https://picsum.photos/id/1040/800/600?grayscale" alt="Pegunungan bersalju dalam kontras tinggi" />
+        </div>
+        <div class="caption">
+          <h3 class="title">Punggung Bukit</h3>
+          <p class="desc">Garis kontur tajam menegaskan kekokohan lanskap.</p>
+          <div class="actions">
+            <button class="btn view" data-src="https://picsum.photos/id/1040/1600/1200?grayscale">Lihat</button>
+            <a class="btn ghost" href="https://picsum.photos/id/1040/2400/1800?grayscale" download>Unduh</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" src="https://picsum.photos/id/1015/800/600?grayscale" alt="Air terjun monokrom dengan debur air halus" />
+        </div>
+        <div class="caption">
+          <h3 class="title">Arus Jatuh</h3>
+          <p class="desc">Eksposur panjang melembutkan aliran—waktu terasa melambat.</p>
+          <div class="actions">
+            <button class="btn view" data-src="https://picsum.photos/id/1015/1600/1200?grayscale">Lihat</button>
+            <a class="btn ghost" href="https://picsum.photos/id/1015/2400/1800?grayscale" download>Unduh</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" src="https://picsum.photos/id/1084/800/600?grayscale" alt="Bangunan arsitektur modern dengan pola berulang" />
+        </div>
+        <div class="caption">
+          <h3 class="title">Ritme Beton</h3>
+          <p class="desc">Pola berulang menari lewat cahaya dan bayangan.</p>
+          <div class="actions">
+            <button class="btn view" data-src="https://picsum.photos/id/1084/1600/1200?grayscale">Lihat</button>
+            <a class="btn ghost" href="https://picsum.photos/id/1084/2400/1800?grayscale" download>Unduh</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" src="https://picsum.photos/id/1016/800/600?grayscale" alt="Hutan pinus dalam nuansa kabut pekat" />
+        </div>
+        <div class="caption">
+          <h3 class="title">Sunyi Rimba</h3>
+          <p class="desc">Kabut menjadi tirai; kedalaman tercipta tanpa warna.</p>
+          <div class="actions">
+            <button class="btn view" data-src="https://picsum.photos/id/1016/1600/1200?grayscale">Lihat</button>
+            <a class="btn ghost" href="https://picsum.photos/id/1016/2400/1800?grayscale" download>Unduh</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" src="https://picsum.photos/id/1025/800/600?grayscale" alt="Burung monokrom mengepakkan sayap" />
+        </div>
+        <div class="caption">
+          <h3 class="title">Sayap</h3>
+          <p class="desc">Gerak yang membekas: kontras menjadi bahasa kebebasan.</p>
+          <div class="actions">
+            <button class="btn view" data-src="https://picsum.photos/id/1025/1600/1200?grayscale">Lihat</button>
+            <a class="btn ghost" href="https://picsum.photos/id/1025/2400/1800?grayscale" download>Unduh</a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- KOMENTAR -->
+    <section id="comments" aria-labelledby="judul-komentar">
+      <h2 id="judul-komentar">Ruang Komentar</h2>
+      <p class="tag">Tinggalkan kesanmu—kata adalah cahaya kedua.</p>
+      <form class="comment-form" id="commentForm">
+        <input type="text" id="nama" name="nama" placeholder="Nama" autocomplete="name" required>
+        <input type="email" id="email" name="email" placeholder="Email (opsional)" autocomplete="email">
+        <textarea id="pesan" name="pesan" placeholder="Tulis komentar..." required></textarea>
+        <button class="btn" type="submit">Kirim</button>
+      </form>
+      <div class="comment-list" id="commentList" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <!-- INFO -->
+  <section id="tentang" class="container" style="margin: auto" aria-label="Tentang">
+    <h2 class="brand" style="font-weight:400; margin:0 0 6px">Tentang</h2>
+    <p class="desc">Monokrom adalah kanvas sederhana: ketika warna pergi, bentuk bercerita. Koleksi ini dibuat untuk menikmati detail kecil—garis, tekstur, dan jeda.</p>
+  </section>
+
+  <section id="kontak" class="container" style="margin: auto" aria-label="Kontak">
+    <h2 class="brand" style="font-weight:400; margin:0 0 6px">Kontak</h2>
+    <p class="desc">Ingin kolaborasi atau lisensi karya? Email ke <a href="mailto:halo@monokrom.studio">halo@monokrom.studio</a>.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap ;">
+      <center>
+      <small>© <span id="year"></span> Monokrom Studio. Semua hak cipta dilindungi.</small>
+      <small>Made with ♥ — hitam & putih selamanya.</small>
+      </center>
+    </div>
+    
+  </footer>
+
+  <!-- LIGHTBOX MODAL -->
+  <dialog id="lightbox">
+    <div class="lightbox-backdrop" data-close></div>
+    <div class="lightbox">
+      <button class="close" aria-label="Tutup" data-close>✕</button>
+      <img id="lightboxImg" alt="Pratinjau foto berukuran besar" />
+    </div>
+  </dialog>
+
+  <script>
+    // Tahun dinamis
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Lightbox sederhana
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    document.querySelectorAll('.btn.view').forEach(b=>{
+      b.addEventListener('click',()=>{
+        lightboxImg.src = b.dataset.src;
+        if(typeof lightbox.showModal === 'function') lightbox.showModal(); else lightbox.setAttribute('open','');
+      });
+    });
+    lightbox.addEventListener('click', (e)=>{
+      if(e.target.matches('[data-close]')){
+        lightboxImg.src='';
+        if(typeof lightbox.close === 'function') lightbox.close(); else lightbox.removeAttribute('open');
+      }
+    });
+
+    // Komentar dengan localStorage (client-side)
+    const LIST_KEY = 'monokrom_comments_v1';
+    const form = document.getElementById('commentForm');
+    const listEl = document.getElementById('commentList');
+
+    const load = () => JSON.parse(localStorage.getItem(LIST_KEY) || '[]');
+    const save = (data) => localStorage.setItem(LIST_KEY, JSON.stringify(data));
+
+    function render(){
+      const data = load();
+      listEl.innerHTML = '';
+      data.forEach((c, idx)=>{
+        const item = document.createElement('article');
+        item.className = 'comment';
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = `${c.nama || 'Anonim'} • ${new Date(c.waktu).toLocaleString()}`;
+        const body = document.createElement('div');
+        body.className = 'body';
+        body.textContent = c.pesan;
+        // Aksi kecil: hapus
+        const del = document.createElement('button');
+        del.className = 'btn ghost';
+        del.style.marginTop = '8px';
+        del.textContent = 'Hapus';
+        del.addEventListener('click', ()=>{
+          const sure = confirm('Hapus komentar ini?');
+          if(!sure) return;
+          const arr = load();
+          arr.splice(idx,1); save(arr); render();
+        });
+        item.appendChild(meta); item.appendChild(body); item.appendChild(del);
+        listEl.appendChild(item);
+      });
+    }
+    render();
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const nama = document.getElementById('nama').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const pesan = document.getElementById('pesan').value.trim();
+      if(!pesan){ return; }
+      const data = load();
+      data.unshift({ nama, email, pesan, waktu: Date.now() });
+      save(data); render();
+      form.reset();
+    });
+  </script>
+</body>
+</html>
